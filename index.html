@@ -26,11 +26,12 @@
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         max-width: 400px;
         width: 100%;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        transition: all 0.3s ease;
       }
       .container:hover {
         transform: translateY(-5px);
         box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        background: linear-gradient(145deg, #ffffff, #f8f9fa);
       }
       h2 {
         text-align: center;
@@ -49,11 +50,16 @@
         border-radius: 8px;
         border: 1px solid #ccc;
         font-size: 16px;
-        transition: border-color 0.3s ease;
+        transition: all 0.3s ease;
+      }
+      input[type="number"]:hover {
+        border-color: #007bff;
+        box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.1);
       }
       input[type="number"]:focus {
         border-color: #007bff;
         outline: none;
+        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
       }
       button {
         margin-top: 20px;
@@ -65,11 +71,17 @@
         background-color: #007bff;
         color: white;
         cursor: pointer;
-        transition: background 0.3s ease, transform 0.2s ease;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
       }
       button:hover {
         background-color: #0056b3;
-        transform: scale(1.05);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+      }
+      button:active {
+        transform: translateY(0);
       }
       #result {
         margin-top: 20px;
@@ -106,32 +118,67 @@
     </style>
   </head>
   <body>
-    <div class="container">
-      <h2> 🧮 Tính a<sup>b</sup> mod n</h2>
-      <label for="base">Cơ số (a):</label>
-      <input type="number" id="base" required />
-
-      <label for="exponent">Số mũ (b):</label>
-      <input type="number" id="exponent" required />
-
-      <label for="modulus">Modulo (n):</label>
-      <input type="number" id="modulus" required />
-
-      <button onclick="calculateModExp()">Tính</button>
-
-      <div id="result"></div>
-    </div>
-
-    <div class="container">
-      <h2>🔢 Thuật toán Euclide mở rộng</h2>
-      <h3>ax + by = gcd(a, b)</h3>
-      <label>Nhập a: <input type="number" id="a" value="1759" /></label><br />
-      <label>Nhập b: <input type="number" id="b" value="550" /></label><br />
-      <button onclick="computeExtendedEuclid()">
-        Tính gcd, x, y, tìm nghịch đảo
-      </button>
-      <div class="result" id="result-euclid"></div>
-      <div id="table-container"></div>
+    <div
+      class="main-content"
+      style="
+        width: 100vw;
+        max-width: 100%;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      "
+    >
+      <div
+        style="
+          width: 100vh;
+          max-width: 100%;
+          margin: 0 auto 14px auto;
+          overflow: hidden;
+          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+        "
+      >
+        <img
+          src="hcmute.png"
+          alt="HCMUTE Banner"
+          style="width: 100%; height: auto; display: block; border-radius: 0"
+        />
+      </div>
+      <div
+        style="
+          display: flex;
+          flex-direction: row;
+          justify-content: center;
+          gap: 20px;
+          margin-top: 4px;
+          width: 100%;
+        "
+      >
+        <div class="container">
+          <h2>🧮 Tính a<sup>b</sup> mod n</h2>
+          <label for="base">Cơ số (a):</label>
+          <input type="number" id="base" required />
+          <label for="exponent">Số mũ (b):</label>
+          <input type="number" id="exponent" required />
+          <label for="modulus">Modulo (n):</label>
+          <input type="number" id="modulus" required />
+          <button onclick="calculateModExp()">Tính</button>
+          <div id="result"></div>
+        </div>
+        <div class="container">
+          <h2>🔢 Thuật toán Euclide mở rộng</h2>
+          <h3>ax + by = gcd(a, b)</h3>
+          <label>Nhập a: <input type="number" id="a"  /></label
+          ><br />
+          <label>Nhập b: <input type="number" id="b" /></label
+          ><br />
+          <button onclick="computeExtendedEuclid()">
+            Tính gcd, x, y, tìm nghịch đảo
+          </button>
+          <div class="result" id="result-euclid"></div>
+          <div id="table-container"></div>
+        </div>
+      </div>
     </div>
 
     <script>
@@ -262,6 +309,21 @@
         tableHtml += "</table>";
         document.getElementById("table-container").innerHTML = tableHtml;
       }
+
+      function animateBanner() {
+        const img = document.querySelector(".main-content img");
+        if (!img) return;
+        img.classList.add("fade-pulse");
+        setTimeout(() => {
+          img.classList.remove("fade-pulse");
+        }, 2000);
+      }
+
+      document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll("button").forEach((btn) => {
+          btn.addEventListener("click", animateBanner);
+        });
+      });
     </script>
   </body>
 </html>
