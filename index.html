@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Máy Tính Modulo Siêu Cấp Vũ Trụ</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background: #f0f4f8;
+        padding: 40px;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        gap: 20px;
+      }
+      .container {
+        background: #ffffff;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        max-width: 400px;
+        width: 100%;
+        margin-bottom: 20px;
+      }
+      h2 {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+      label {
+        display: block;
+        margin-top: 15px;
+        font-weight: bold;
+      }
+      input[type="number"] {
+        width: 100%;
+        padding: 10px;
+        margin-top: 5px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        font-size: 16px;
+      }
+      button {
+        margin-top: 20px;
+        width: 100%;
+        padding: 12px;
+        font-size: 16px;
+        border: none;
+        border-radius: 8px;
+        background-color: #007bff;
+        color: white;
+        cursor: pointer;
+        transition: background 0.3s ease;
+      }
+      button:hover {
+        background-color: #0056b3;
+      }
+      #result {
+        margin-top: 20px;
+        font-size: 18px;
+        text-align: center;
+        font-weight: bold;
+      }
+      /* CSS cho phần Extended Euclidean Algorithm */
+      table {
+        border-collapse: collapse;
+        margin-top: 20px;
+        width: 100%;
+        max-width: 600px;
+      }
+      th,
+      td {
+        border: 1px solid #aaa;
+        padding: 8px;
+        text-align: center;
+      }
+      th {
+        background: #ddd;
+      }
+      .result {
+        margin-top: 20px;
+        font-size: 18px;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>Tính a<sup>b</sup> mod n</h2>
+      <label for="base">Cơ số (a):</label>
+      <input type="number" id="base" required />
+
+      <label for="exponent">Số mũ (b):</label>
+      <input type="number" id="exponent" required />
+
+      <label for="modulus">Modulo (n):</label>
+      <input type="number" id="modulus" required />
+
+      <button onclick="calculateModExp()">Tính</button>
+
+      <div id="result"></div>
+    </div>
+
+    <div class="container">
+      <h2>🔢 Thuật toán Euclide mở rộng</h2>
+      <h3>ax + by = gcd(a, b)</h3>
+      <label>Nhập a: <input type="number" id="a" value="1759" /></label><br />
+      <label>Nhập b: <input type="number" id="b" value="550" /></label><br />
+      <button onclick="computeExtendedEuclid()">Tính gcd, x, y, tìm nghịch đảo</button>
+      <div class="result" id="result-euclid"></div>
+      <div id="table-container"></div>
+    </div>
+
+    <script>
+      function modInverse(a, m) {
+        // Extended Euclidean Algorithm
+        let m0 = m,
+          x0 = 0,
+          x1 = 1;
+        a = ((a % m) + m) % m;
+        if (m === 1) return 0;
+
+        while (a > 1) {
+          let q = Math.floor(a / m);
+          [a, m] = [m, a % m];
+          [x0, x1] = [x1 - q * x0, x0];
+        }
+
+        return x1 < 0 ? x1 + m0 : x1;
+      }
+
+      function modPow(base, exponent, mod) {
+        base = ((base % mod) + mod) % mod;
+
+        if (exponent < 0) {
+          base = modInverse(base, mod);
+          if (base === null) return "Không có nghịch đảo modular";
+          exponent = -exponent;
+        }
+
+        let result = 1;
+        while (exponent > 0) {
+          if (exponent % 2 === 1) {
+            result = (result * base) % mod;
+          }
+          base = (base * base) % mod;
+          exponent = Math.floor(exponent / 2);
+        }
+        return result;
+      }
+
+      function calculateModExp() {
+        const a = parseInt(document.getElementById("base").value);
+        const b = parseInt(document.getElementById("exponent").value);
+        const n = parseInt(document.getElementById("modulus").value);
+
+        if (isNaN(a) || isNaN(b) || isNaN(n) || n === 0) {
+          document.getElementById("result").innerText =
+            "Vui lòng nhập đầy đủ và hợp lệ.";
+          return;
+        }
+
+        const result = modPow(a, b, n);
+        document.getElementById(
+          "result"
+        ).innerText = `Kết quả: ${a}^${b} mod ${n} = ${result}`;
+      }
+
+      function mod(a, b) {
+        return ((a % b) + b) % b;
+      }
+
+      function computeExtendedEuclid() {
+        const a = parseInt(document.getElementById("a").value);
+        const b = parseInt(document.getElementById("b").value);
+
+        if (isNaN(a) || isNaN(b) || b === 0) {
+          alert("Vui lòng nhập a và b hợp lệ (b ≠ 0)");
+          return;
+        }
+
+        let r1 = a,
+          r2 = b;
+        let x1 = 1,
+          x2 = 0;
+        let y1 = 0,
+          y2 = 1;
+
+        let steps = [];
+        let i = 0;
+        while (r2 !== 0) {
+          const q = Math.floor(r1 / r2);
+          const r = r1 % r2;
+
+          const x = x1 - q * x2;
+          const y = y1 - q * y2;
+
+          steps.push({ i, r: r1, q, x: x1, y: y1 });
+
+          r1 = r2;
+          r2 = r;
+          x1 = x2;
+          x2 = x;
+          y1 = y2;
+          y2 = y;
+
+          i++;
+        }
+
+        // Thêm dòng cuối
+        steps.push({ i, r: r1, q: "", x: x1, y: y1 });
+
+        // Kết quả
+        let resultHTML = `
+        ✅ gcd(${a}, ${b}) = <b>${r1}</b><br>
+        🔁 x = <b>${x1}</b>, y = <b>${y1}</b>
+      `;
+
+        if (r1 === 1) {
+          const inv = mod(x1, b);
+          resultHTML += `<br>🧮 Nghịch đảo modulo: <b>${a}<sup>-1</sup> ≡ ${inv} (mod ${b})</b>`;
+        } else {
+          resultHTML += `<br>❌ Vì gcd ≠ 1 nên <b>không tồn tại nghịch đảo modulo</b>`;
+        }
+
+        document.getElementById("result-euclid").innerHTML = resultHTML;
+
+        // Hiển thị bảng
+        let tableHtml =
+          "<table><tr><th>i</th><th>r</th><th>q</th><th>x<sub>i</sub></th><th>y<sub>i</sub></th></tr>";
+        for (const row of steps) {
+          tableHtml += `<tr>
+          <td>${row.i}</td>
+          <td>${row.r}</td>
+          <td>${row.q}</td>
+          <td>${row.x}</td>
+          <td>${row.y}</td>
+        </tr>`;
+        }
+        tableHtml += "</table>";
+        document.getElementById("table-container").innerHTML = tableHtml;
+      }
+    </script>
+  </body>
+</html>
