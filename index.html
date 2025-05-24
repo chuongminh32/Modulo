@@ -26,12 +26,9 @@
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         max-width: 400px;
         width: 100%;
-        transition: all 0.3s ease;
       }
       .container:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-        background: linear-gradient(145deg, #ffffff, #f8f9fa);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
       }
       h2 {
         text-align: center;
@@ -50,16 +47,13 @@
         border-radius: 8px;
         border: 1px solid #ccc;
         font-size: 16px;
-        transition: all 0.3s ease;
       }
       input[type="number"]:hover {
         border-color: #007bff;
-        box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.1);
       }
       input[type="number"]:focus {
         border-color: #007bff;
         outline: none;
-        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
       }
       button {
         margin-top: 20px;
@@ -71,17 +65,14 @@
         background-color: #007bff;
         color: white;
         cursor: pointer;
-        transition: all 0.3s ease;
-        position: relative;
-        overflow: hidden;
+        transition: transform 0.2s ease;
       }
       button:hover {
         background-color: #0056b3;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+        transform: scale(1.05);
       }
       button:active {
-        transform: translateY(0);
+        transform: scale(0.98);
       }
       #result {
         margin-top: 20px;
@@ -114,6 +105,22 @@
       /* Animation cho bảng */
       table:hover {
         transform: scale(1.02);
+      }
+      /* Add animation keyframes */
+      @keyframes bounce {
+        0% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.05);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      .bounce-animation {
+        animation: bounce 0.5s ease;
       }
     </style>
   </head>
@@ -168,10 +175,8 @@
         <div class="container">
           <h2>🔢 Thuật toán Euclide mở rộng</h2>
           <h3>ax + by = gcd(a, b)</h3>
-          <label>Nhập a: <input type="number" id="a"  /></label
-          ><br />
-          <label>Nhập b: <input type="number" id="b" /></label
-          ><br />
+          <label>Nhập a: <input type="number" id="a" /></label><br />
+          <label>Nhập b: <input type="number" id="b" /></label><br />
           <button onclick="computeExtendedEuclid()">
             Tính gcd, x, y, tìm nghịch đảo
           </button>
@@ -313,10 +318,15 @@
       function animateBanner() {
         const img = document.querySelector(".main-content img");
         if (!img) return;
-        img.classList.add("fade-pulse");
-        setTimeout(() => {
-          img.classList.remove("fade-pulse");
-        }, 2000);
+
+        // Remove any existing animation class
+        img.classList.remove("bounce-animation");
+
+        // Force a reflow
+        void img.offsetWidth;
+
+        // Add the animation class
+        img.classList.add("bounce-animation");
       }
 
       document.addEventListener("DOMContentLoaded", function () {
