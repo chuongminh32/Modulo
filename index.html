@@ -177,10 +177,11 @@
         <div class="container">
           <h2>🔢 Thuật toán Euclide mở rộng</h2>
           <h3>ax + by = gcd(a, b)</h3>
+          <h3> a^(-1) = z (mod b)</h3>
           <label>Nhập a: <input type="number" id="a" /></label><br />
           <label>Nhập b: <input type="number" id="b" /></label><br />
           <button onclick="computeExtendedEuclid()">
-            Tính gcd, x, y, tìm nghịch đảo
+            Tính gcd, x, y, z
           </button>
           <div class="result" id="result-euclid"></div>
           <div id="table-container"></div>
@@ -294,14 +295,14 @@
 
         if (r1 === 1) {
           const inv = mod(x1, b);
-          resultHTML += `<br> Nghịch đảo modulo: <b>${a}<sup>-1</sup> ≡ ${inv} (mod ${b})</b>`;
+          resultHTML += `<br> z = ${inv} </b>`;
         } else {
           resultHTML += `<br>❌ Vì gcd ≠ 1 nên <b>không tồn tại nghịch đảo modulo</b>`;
         }
 
         document.getElementById("result-euclid").innerHTML = resultHTML;
 
-        // Hiển thị bảng
+       /* // Hiển thị bảng
         let tableHtml =
           "<table><tr><th>i</th><th>r</th><th>q</th><th>x<sub>i</sub></th><th>y<sub>i</sub></th></tr>";
         for (const row of steps) {
@@ -315,6 +316,7 @@
         }
         tableHtml += "</table>";
         document.getElementById("table-container").innerHTML = tableHtml;
+        */
       }
 
       function animateBanner() {
