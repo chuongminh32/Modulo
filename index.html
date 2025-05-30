@@ -124,6 +124,36 @@
       .bounce-animation {
         animation: bounce 0.5s ease;
       }
+
+      /* RSA Calculator Styles */
+      .rsa-section {
+        margin-top: 20px;
+        padding: 15px;
+        border: 1px solid #eee;
+        border-radius: 8px;
+      }
+
+      .rsa-section h3 {
+        margin-top: 0;
+        color: #444;
+        font-size: 1.1em;
+      }
+
+      .rsa-section button {
+        margin: 10px 5px;
+        width: calc(50% - 10px);
+      }
+
+      .rsa-section .result {
+        margin-top: 15px;
+        padding: 10px;
+        background: #f8f9fa;
+        border-radius: 6px;
+      }
+
+      .rsa-section .result p {
+        margin: 5px 0;
+      }
     </style>
   </head>
   <body>
@@ -177,14 +207,42 @@
         <div class="container">
           <h2>🔢 Thuật toán Euclide mở rộng</h2>
           <h3>ax + by = gcd(a, b)</h3>
-          <h3> a^(-1) = z (mod b)</h3>
+          <h3>a^(-1) = z (mod b)</h3>
           <label>Nhập a: <input type="number" id="a" /></label><br />
           <label>Nhập b: <input type="number" id="b" /></label><br />
-          <button onclick="computeExtendedEuclid()">
-            Tính gcd, x, y, z
-          </button>
+          <button onclick="computeExtendedEuclid()">Tính gcd, x, y, z</button>
           <div class="result" id="result-euclid"></div>
           <div id="table-container"></div>
+        </div>
+        <div class="container">
+          <h2>🔐 RSA Calculator</h2>
+          <div class="rsa-section">
+            <h3>Key Generation</h3>
+            <label for="p">Prime number p:</label>
+            <input type="number" id="p" required />
+            <label for="q">Prime number q:</label>
+            <input type="number" id="q" required />
+            <button onclick="generateRSAKeys()">Generate Keys</button>
+            <div id="rsa-keys" class="result"></div>
+          </div>
+
+          <div class="rsa-section">
+            <h3>Encryption/Decryption</h3>
+            <label for="message">Message (M):</label>
+            <input type="number" id="message" required />
+            <button onclick="encryptMessage()">Encrypt</button>
+            <button onclick="decryptMessage()">Decrypt</button>
+            <div id="rsa-result" class="result"></div>
+          </div>
+
+          <div class="rsa-section">
+            <h3>Digital Signature</h3>
+            <label for="sign-message">Message to Sign (M):</label>
+            <input type="number" id="sign-message" required />
+            <button onclick="signMessage()">Sign</button>
+            <button onclick="verifySignature()">Verify</button>
+            <div id="signature-result" class="result"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -302,7 +360,7 @@
 
         document.getElementById("result-euclid").innerHTML = resultHTML;
 
-       /* // Hiển thị bảng
+        /* // Hiển thị bảng
         let tableHtml =
           "<table><tr><th>i</th><th>r</th><th>q</th><th>x<sub>i</sub></th><th>y<sub>i</sub></th></tr>";
         for (const row of steps) {
@@ -338,6 +396,152 @@
           btn.addEventListener("click", animateBanner);
         });
       });
+
+      // RSA Functions
+      function generateRSAKeys() {
+        const p = parseInt(document.getElementById("p").value);
+        const q = parseInt(document.getElementById("q").value);
+
+        if (isNaN(p) || isNaN(q)) {
+          alert("Please enter valid prime numbers for p and q");
+          return;
+        }
+
+        const n = p * q;
+        const phi = (p - 1) * (q - 1);
+
+        // Find a suitable e (public exponent)
+        // Common values for e are 3, 5, 17, 65537
+        const possibleE = [3, 5, 17, 65537];
+        let e = null;
+
+        for (let candidate of possibleE) {
+          if (candidate < phi && gcd(candidate, phi) === 1) {
+            e = candidate;
+            break;
+          }
+        }
+
+        if (e === null) {
+          // If common values don't work, find the smallest suitable e
+          for (let i = 2; i < phi; i++) {
+            if (gcd(i, phi) === 1) {
+              e = i;
+              break;
+            }
+          }
+        }
+
+        if (e === null) {
+          alert("Could not find a suitable public exponent");
+          return;
+        }
+
+        // Calculate d (private key)
+        const d = modInverse(e, phi);
+        if (d === null) {
+          alert("Could not calculate private key");
+          return;
+        }
+
+        document.getElementById("rsa-keys").innerHTML = `
+          <p>n = ${n}</p>
+          <p>φ(n) = ${phi}</p>
+          <p>Public Key (e,n): (${e}, ${n})</p>
+          <p>Private Key (d,n): (${d}, ${n})</p>
+        `;
+
+        // Store the values for encryption/decryption
+        window.rsaValues = { p, q, e, d, n, phi };
+      }
+
+      function gcd(a, b) {
+        while (b !== 0) {
+          [a, b] = [b, a % b];
+        }
+        return a;
+      }
+
+      function encryptMessage() {
+        const message = parseInt(document.getElementById("message").value);
+        if (!window.rsaValues) {
+          alert("Please generate RSA keys first");
+          return;
+        }
+
+        if (isNaN(message)) {
+          alert("Please enter a valid message");
+          return;
+        }
+
+        const { e, n } = window.rsaValues;
+        const encrypted = modPow(message, e, n);
+        document.getElementById("rsa-result").innerHTML = `
+          <p>Encrypted Message (C): ${encrypted}</p>
+        `;
+      }
+
+      function decryptMessage() {
+        const encrypted = parseInt(document.getElementById("message").value);
+        if (!window.rsaValues) {
+          alert("Please generate RSA keys first");
+          return;
+        }
+
+        if (isNaN(encrypted)) {
+          alert("Please enter a valid encrypted message");
+          return;
+        }
+
+        const { d, n } = window.rsaValues;
+        const decrypted = modPow(encrypted, d, n);
+
+        document.getElementById("rsa-result").innerHTML = `
+          <p>Decrypted Message (M): ${decrypted}</p>
+        `;
+      }
+
+      function signMessage() {
+        const message = parseInt(document.getElementById("sign-message").value);
+        if (!window.rsaValues) {
+          alert("Please generate RSA keys first");
+          return;
+        }
+
+        if (isNaN(message)) {
+          alert("Please enter a valid message");
+          return;
+        }
+
+        const { d, n } = window.rsaValues;
+        const signature = modPow(message, d, n);
+
+        document.getElementById("signature-result").innerHTML = `
+          <p>Digital Signature (S): ${signature}</p>
+        `;
+      }
+
+      function verifySignature() {
+        const signature = parseInt(
+          document.getElementById("sign-message").value
+        );
+        if (!window.rsaValues) {
+          alert("Please generate RSA keys first");
+          return;
+        }
+
+        if (isNaN(signature)) {
+          alert("Please enter a valid signature");
+          return;
+        }
+
+        const { e, n } = window.rsaValues;
+        const verified = modPow(signature, e, n);
+
+        document.getElementById("signature-result").innerHTML = `
+          <p>Verified Message (M): ${verified}</p>
+        `;
+      }
     </script>
   </body>
 </html>
